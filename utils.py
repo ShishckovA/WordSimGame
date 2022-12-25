@@ -39,6 +39,6 @@ def filter_words(words, embeddings):
     return new_words
 
 
-# EMBEDDINGS = load_embeddings_navec(EMBEDDINGS_PATH)
-EMBEDDINGS = load_embeddings_ruscorp("180/model.txt")
+EMBEDDINGS = load_embeddings_navec(EMBEDDINGS_PATH)
+# EMBEDDINGS = load_embeddings_ruscorp("180/model.txt")
 WORDS = filter_words(read_vocab(WORDS_PATH), EMBEDDINGS)

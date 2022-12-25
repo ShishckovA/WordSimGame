@@ -6,7 +6,7 @@ class BotStates(StatesGroup):
 
 HINTS_INDEXES = [1000, 500, 100, 50, 25, 10, 5]
 
-EMBEDDINGS_PATH = 'navec_hudlit_v1_12B_500K_300d_100q.tar'
+EMBEDDINGS_PATH = "navec_hudlit_v1_12B_500K_300d_100q.tar"
 # WORDS_PATH = "words.txt"
 WORDS_PATH = "words.txt"
 TOKEN = os.getenv("TOKEN")
