@@ -21,7 +21,7 @@ def load_embeddings_ruscorp(emb_path):
     return res
 
 
-def read_vocab(filename):
+def read_vocab(filename: str) -> list[str]:
     words = []
     with open(filename) as f:
         for elem in f.readlines():
@@ -29,12 +29,16 @@ def read_vocab(filename):
     return words
 
 
-def filter_words(words, embeddings):
+def filter_words(words: list[str], embeddings) -> list[str]:
     new_words = []
     for word in words:
         if word in embeddings:
             new_words.append(word)
     return new_words
+
+
+def normalize_guess(guess: str) -> str:
+    return guess.replace("ё", "е").lower()
 
 
 EMBEDDINGS = load_embeddings_navec(EMBEDDINGS_PATH)

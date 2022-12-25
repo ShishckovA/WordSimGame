@@ -1,5 +1,3 @@
-import string
-
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import random
 from aiogram.types import BotCommand
@@ -11,17 +9,17 @@ import asyncio
 from aiogram import Bot, Dispatcher, types
 
 from config import BotStates, HINTS_INDEXES, TOKEN
-from utils import EMBEDDINGS, WORDS
+from utils import EMBEDDINGS, WORDS, normalize_guess
 
 
-def build_counter(word):
+def build_counter(word: str) -> tuple[dict[str, int], list[str]]:
     word_emb = EMBEDDINGS[word]
     words_new = sorted(WORDS, key=lambda x: spatial.distance.cosine(word_emb, EMBEDDINGS[x]))
     word_to_dist = {v: i for i, v in enumerate(words_new)}
     return word_to_dist, words_new
 
 
-def new_game():
+def new_game() -> tuple[str, dict[str, int], list[str]]:
     word = random.choice(WORDS)
     word_to_dist, dist_to_word = build_counter(word)
 
@@ -51,16 +49,12 @@ async def get_state(message: types.Message, state: FSMContext):
     await message.answer(str(data)[:500])
 
 
-def normalize(guess: str):
-    return guess.replace("ё", "е").lower()
-
-
 async def handle_guess(message: types.Message, state: FSMContext):
     data = await state.get_data()
     target_word = data["word"]
     word_to_dist = data["word_to_dist"]
     guesses = data["guesses"]
-    guess = normalize(message.text)
+    guess = normalize_guess(message.text)
     answer = f"Твоё слово: {markdown.bold(guess)}"
     if guess == target_word:
         answer += markdown.escape_md("\nПраивльно!")
@@ -80,7 +74,7 @@ async def handle_guess(message: types.Message, state: FSMContext):
         await message.answer(answer, parse_mode="MarkdownV2")
 
 
-async def top(message: types.Message, state: FSMContext):
+async def handle_top(message: types.Message, state: FSMContext):
     data = await state.get_data()
     word_to_dist = data["word_to_dist"]
     guesses = data["guesses"]
@@ -103,7 +97,7 @@ async def finish_game(message, state):
     await state.finish()
 
 
-async def hint(message, state):
+async def handle_hint(message, state):
     data = await state.get_data()
     dist_to_word = data["dist_to_word"]
     hints_used = data["hints_used"] + 1
@@ -116,7 +110,7 @@ async def hint(message, state):
     await message.answer(answer, parse_mode="MarkdownV2")
 
 
-async def handle_messaage(message, state):
+async def handle_message_without_game(message: types.Message, state: FSMContext):
     await message.answer("Игра пока не начата =(")
 
 
@@ -138,10 +132,10 @@ async def main():
     dp.register_message_handler(cmd_start, commands="start", state="*")
     dp.register_message_handler(get_state, commands="state", state="*")
     dp.register_message_handler(finish_game, commands="finish", state=BotStates.game_started)
-    dp.register_message_handler(top, commands="top", state=BotStates.game_started)
-    dp.register_message_handler(hint, commands="hint", state=BotStates.game_started)
+    dp.register_message_handler(handle_top, commands="top", state=BotStates.game_started)
+    dp.register_message_handler(handle_hint, commands="hint", state=BotStates.game_started)
     dp.register_message_handler(handle_guess, state=BotStates.game_started)
-    dp.register_message_handler(handle_messaage, state="*")
+    dp.register_message_handler(handle_message_without_game, state="*")
 
     await dp.start_polling(bot)
 
