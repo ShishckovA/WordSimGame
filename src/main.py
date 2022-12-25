@@ -2,7 +2,7 @@ import string
 
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import random
-from aiogram.types import BotCommand, ChatMemberUpdated
+from aiogram.types import BotCommand
 
 from aiogram.dispatcher import FSMContext
 from aiogram.utils import markdown
@@ -12,7 +12,6 @@ from aiogram import Bot, Dispatcher, types
 
 from config import BotStates, HINTS_INDEXES, TOKEN
 from utils import EMBEDDINGS, WORDS
-
 
 
 def build_counter(word):
@@ -91,6 +90,7 @@ async def top(message: types.Message, state: FSMContext):
     for dist, word in words_dists[:10]:
         answer += f"\n{dist}: {markdown.bold(word)}"
     await message.answer(answer, parse_mode="MarkdownV2")
+
 
 async def finish_game(message, state):
     data = await state.get_data()

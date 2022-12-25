@@ -34,8 +34,6 @@ def filter_words(words, embeddings):
     for word in words:
         if word in embeddings:
             new_words.append(word)
-        # else:
-        #     print(word)
     return new_words
 
 
